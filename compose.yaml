@@ -1,0 +1,28 @@
+# Deploy file and CI contract (github.com/giakiet05/ci-templates): every service with `build:` is an
+# image CI builds and pushes to its `image:`. Paths in x-ci are relative to the repository root.
+#
+# Local run: docker compose up --build
+x-ci:
+  # Shared library without an image: linted and tested whenever it changes.
+  checks: [libs/shared]
+
+services:
+  api:
+    image: ghcr.io/giakiet05/ci-playground-api:${TAG:-dev}
+    build:
+      # Repo root, so the Dockerfile can copy libs/shared next to the service.
+      context: .
+      dockerfile: services/api/Dockerfile
+    x-ci:
+      # api imports libs/shared, so a change there must rebuild api too.
+      watch: ["libs/shared/**"]
+    ports: ["8080:8080"]
+    restart: unless-stopped
+
+  worker:
+    image: ghcr.io/giakiet05/ci-playground-worker:${TAG:-dev}
+    build:
+      context: services/worker
+    environment:
+      WORKER_INTERVAL_SECONDS: "30"
+    restart: unless-stopped
