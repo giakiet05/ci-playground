@@ -1,0 +1,14 @@
+x-ci:
+  checks: [libs/shared]
+
+services: 
+  api: 
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    x-ci: 
+      watch: ["lib/shared/**"]
+  
+  worker:
+    build:
+      context: services/worker
