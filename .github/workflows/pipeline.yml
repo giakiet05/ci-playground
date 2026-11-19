@@ -1,28 +1,25 @@
-# CI/CD via the shared template (github.com/giakiet05/ci-templates).
-# The template reads compose.yaml to find the images and each service's Makefile to lint and test.
 name: pipeline
 
 on:
   pull_request:
     branches: [dev, main]
   push:
-    branches: [dev]
+    branches: [main]
     tags: ["v*"]
-  workflow_dispatch: # manual run: lint, test and build every service
+  workflow_dispatch:
 
-concurrency:
-  # Publishes run in order so :dev moves in order; a newer push to a PR cancels its stale run.
+concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Ceiling for the template's jobs; each job requests only what it needs.
 permissions:
   contents: write
   packages: write
 
-jobs:
-  pipeline:
+jobs: 
+  pipeline: 
     uses: giakiet05/ci-templates/.github/workflows/service.yml@main
-    with:
-      deploy: none # switch to coolify when practising deployment
+    with: 
+      build-compose-file: compose.override.yaml
+      deploy: none
     secrets: inherit
