@@ -16,7 +16,6 @@ services:
     x-ci:
       # api imports libs/shared, so a change there must rebuild api too.
       watch: ["libs/shared/**"]
-    ports: ["8080:8080"]
     restart: unless-stopped
 
   worker:
